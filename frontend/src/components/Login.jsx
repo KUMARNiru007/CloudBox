@@ -21,6 +21,8 @@ const Login = ({ onLogin, switchToRegister }) => {
     
     try {
       const response = await authService.login({ email, password });
+      // Store the token in localStorage
+      localStorage.setItem('authToken', response.data.accessToken);
       onLogin(response.data.user);
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');

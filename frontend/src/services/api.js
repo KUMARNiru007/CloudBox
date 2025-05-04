@@ -25,26 +25,43 @@ api.interceptors.request.use(
   }
 );
 
+// Add response interceptor to handle 401 errors
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      // Clear auth data on unauthorized
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+      // Only reload if we're not already on the login page
+      if (window.location.pathname !== '/login') {
+        window.location.reload();
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Authentication services
 export const authService = {
   register: async (userData) => {
     const response = await api.post('/auth/register', userData);
-    if (response.data.accessToken) {
-      localStorage.setItem('authToken', response.data.accessToken);
-    }
     return response.data;
   },
   
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
-    if (response.data.accessToken) {
-      localStorage.setItem('authToken', response.data.accessToken);
+    // Store token in localStorage
+    if (response.data && response.data.data && response.data.data.accessToken) {
+      localStorage.setItem('authToken', response.data.data.accessToken);
     }
     return response.data;
   },
   
   logout: async () => {
     const response = await api.post('/auth/logout');
+    // Clear token on logout
     localStorage.removeItem('authToken');
     return response.data;
   },
@@ -54,12 +71,13 @@ export const authService = {
     return response.data;
   },
   
-  // Add this method to check if user is authenticated
   checkAuthStatus: async () => {
     try {
       const response = await api.get('/auth/me');
       return response.data;
     } catch (error) {
+      // Clear token if verification fails
+      localStorage.removeItem('authToken');
       return null;
     }
   },

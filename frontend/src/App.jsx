@@ -108,6 +108,7 @@ function App() {
     setIsAuthenticated(false);
     setFiles([]);
     setRecycleBin([]);
+    // Remove localStorage.removeItem('authToken');
   };
   
   // If not authenticated, show login/register screens
