@@ -5,7 +5,6 @@ const fileSchema = new mongoose.Schema(
     filename: {
       type: String,
       required: true,
-      trim: true,
     },
     originalName: {
       type: String,
@@ -27,7 +26,7 @@ const fileSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    }
+    },
   },
   { timestamps: true }
 );

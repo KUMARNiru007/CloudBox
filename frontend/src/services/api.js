@@ -114,3 +114,32 @@ export const fileService = {
 };
 
 export default api;
+
+let accessToken = null;
+
+export function setAccessToken(token) {
+    accessToken = token;
+}
+
+export async function apiFetch(url, options = {}) {
+    if (!options.headers) options.headers = {};
+    if (accessToken) {
+        options.headers['Authorization'] = 'Bearer ' + accessToken;
+    }
+    let response = await fetch(url, options);
+
+    if (response.status === 401) {
+        // Try to refresh the token
+        const refreshResponse = await fetch('/refresh', { method: 'POST', credentials: 'include' });
+        if (refreshResponse.ok) {
+            const data = await refreshResponse.json();
+            setAccessToken(data.accessToken);
+            // Retry original request
+            options.headers['Authorization'] = 'Bearer ' + data.accessToken;
+            response = await fetch(url, options);
+        } else {
+            // Redirect to login or handle logout
+        }
+    }
+    return response;
+}
