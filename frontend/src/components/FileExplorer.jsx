@@ -16,6 +16,7 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
 
   // Get file extension
   const getFileExtension = (filename) => {
+    if (!filename) return '';
     const ext = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
     return `.${ext.toLowerCase()}`;
   };
@@ -31,11 +32,12 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
     const folderSizes = folders.map(folder => ({
       ...folder,
       size: files
+        .filter(file => file && file.name)
         .filter(file => {
           const extension = getFileExtension(file.name);
           return folder.extensions.includes(extension);
         })
-        .reduce((total, file) => total + file.size, 0)
+        .reduce((total, file) => total + (file.size || 0), 0)
     }));
     setFolders(folderSizes);
   };
@@ -47,7 +49,7 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
 
   // Filter files based on search query
   const filteredFiles = files.filter(file => 
-    file.name.toLowerCase().includes(searchQuery.toLowerCase())
+    file && file.name && file.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Upload a file to the system
