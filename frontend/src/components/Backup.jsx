@@ -5,12 +5,12 @@ import FileItem from './FileItem';
 const Backup = ({ darkMode, backup, setRecycleBin, setFiles }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Filter files based on search query
+  // Filter files based on search 
   const filteredFiles = backup.filter(file => 
     file.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Format file size for display
+  // Format file 
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B';
     else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
@@ -22,7 +22,7 @@ const Backup = ({ darkMode, backup, setRecycleBin, setFiles }) => {
   const handleRestoreFile = (fileId) => {
     const fileToRestore = backup.find(file => file.id === fileId);
     if (fileToRestore) {
-      // Add file back to files array
+   
       setFiles(prevFiles => [...prevFiles, fileToRestore]);
       // Remove file from recycle bin
       setRecycleBin(prevRecycleBin => prevRecycleBin.filter(file => file.id !== fileId));

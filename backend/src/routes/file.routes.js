@@ -7,16 +7,16 @@ import fs from "fs";
 
 const router = Router();
 
-// Create uploads directory if it doesn't exist
+
 const uploadsDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Configure multer for file storage
+// Configure multer 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    // Create user-specific directory
+    // Create
     const userDir = path.join(uploadsDir, req.user._id.toString());
     if (!fs.existsSync(userDir)) {
       fs.mkdirSync(userDir, { recursive: true });

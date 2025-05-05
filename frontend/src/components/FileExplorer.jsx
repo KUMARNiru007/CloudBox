@@ -3,7 +3,7 @@ import './FileExplorer.css';
 import FileItem from './FileItem';
 import { fileService } from '../services/api';  // Add this import
 
-const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
+const FileExplorer = ({ darkMode, files, setFiles, setRecycleBin }) => {
   const [folders, setFolders] = useState([
     { name: 'Documents', size: null, extensions: ['.pdf', '.doc', '.docx', '.txt'] },
     { name: 'Music', size: null, extensions: ['.mp3', '.wav', '.ogg', '.m4a'] },
@@ -22,7 +22,6 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
     return `.${ext.toLowerCase()}`;
   };
 
-  // Determine which folder a file belongs to
   const getFolderForFile = (filename) => {
     const extension = `.${getFileExtension(filename)}`;
     return folders.find(folder => folder.extensions.includes(extension));
@@ -43,17 +42,16 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
     setFolders(folderSizes);
   };
 
-  // Automatically update folder sizes when files change
+  // Automatically update folder sizes 
   useEffect(() => {
     updateFolderSizes(files);
   }, [files]);
 
-  // Filter files based on search query
+ 
   const filteredFiles = files.filter(file => 
     file && file.name && file.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Upload a file to the system
   const uploadFile = async (file) => {
     setIsLoading(true);
     
@@ -72,30 +70,30 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
       }
     } catch (error) {
       console.error("Error uploading file:", error);
-      // You could add error handling UI here
+
     } finally {
       setIsLoading(false);
     }
   };
   
-  // Handle upload button click
+  // upload button 
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
   
-  // Handle file selection
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     
-    // Validate files before upload
+
     selectedFiles.forEach(file => {
-      // Check file size (10MB limit)
+      //file size (10MB limit)
       if (file.size > 10 * 1024 * 1024) {
         alert(`File ${file.name} is too large. Maximum size is 10MB.`);
         return;
       }
       
-      // You can add more validations here (file type, etc.)
+
       
       uploadFile(file);
     });
@@ -103,7 +101,7 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
     e.target.value = '';
   };
   
-  // Format file size for display
+  
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B';
     else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
@@ -116,17 +114,15 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
     const fileToRecycle = files.find(file => file.id === fileId);
     if (fileToRecycle) {
       try {
-        // Call the API to delete the file
+
         await fileService.deleteFile(fileId);
-        
-        // Add file to recycle bin (frontend only)
+
         setRecycleBin(prevRecycleBin => [...prevRecycleBin, fileToRecycle]);
         
-        // Remove file from files array
         setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
       } catch (error) {
         console.error("Error deleting file:", error);
-        // You could add error handling UI here
+    
       }
     }
   };
@@ -137,11 +133,11 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
       await fileService.downloadFile(file.id, file.name);
     } catch (error) {
       console.error("Error downloading file:", error);
-      // You could add error handling UI here
+     
     }
   };
   
-  // Navigate to a folder
+
   const handleFolderClick = (folderName) => {
     console.log(`Navigating to folder: ${folderName}`);
   };

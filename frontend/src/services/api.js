@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3000/api/v1';
 
-// Create axios instance
+// Create axios
 const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
@@ -11,7 +11,7 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor to include auth token if available
+// Add request interceptor 
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
@@ -25,7 +25,6 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle 401 errors
 api.interceptors.response.use(
   response => response,
   error => {
@@ -52,7 +51,7 @@ export const authService = {
   
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
-    // Store token in localStorage
+    // Store in localStorage
     if (response.data && response.data.data && response.data.data.accessToken) {
       localStorage.setItem('authToken', response.data.data.accessToken);
     }
@@ -61,7 +60,7 @@ export const authService = {
   
   logout: async () => {
     const response = await api.post('/auth/logout');
-    // Clear token on logout
+  
     localStorage.removeItem('authToken');
     return response.data;
   },
@@ -76,7 +75,7 @@ export const authService = {
       const response = await api.get('/auth/me');
       return response.data;
     } catch (error) {
-      // Clear token if verification fails
+      
       localStorage.removeItem('authToken');
       return null;
     }
@@ -112,13 +111,13 @@ export const fileService = {
     return response.data;
   },
 
-  // Add this new method
+
   syncFiles: async () => {
     const response = await api.get('/files');
     return response.data;
   },
   
-  // Add these new methods
+
   deleteFile: async (fileId) => {
     const response = await api.delete(`/files/${fileId}`);
     return response.data;
@@ -142,7 +141,7 @@ export const fileService = {
   }
 };
 
-// Remove the duplicate apiFetch function at the bottom since you're using axios
+
 export default api;
 
 let accessToken = null;
@@ -159,17 +158,15 @@ export async function apiFetch(url, options = {}) {
     let response = await fetch(url, options);
 
     if (response.status === 401) {
-        // Try to refresh the token
+       
         const refreshResponse = await fetch('/refresh', { method: 'POST', credentials: 'include' });
         if (refreshResponse.ok) {
             const data = await refreshResponse.json();
             setAccessToken(data.accessToken);
-            // Retry original request
+            
             options.headers['Authorization'] = 'Bearer ' + data.accessToken;
             response = await fetch(url, options);
-        } else {
-            // Redirect to login or handle logout
-        }
+        } 
     }
     return response;
 }

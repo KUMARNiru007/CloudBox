@@ -80,10 +80,10 @@ const loginUser = asyncHandler(async (req, res) => {
   // Generate tokens
   const { accessToken, refreshToken } = await generateTokens(user._id);
 
-  // Get user without sensitive info
+
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
-  // Set cookies
+  // cookies
   const options = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

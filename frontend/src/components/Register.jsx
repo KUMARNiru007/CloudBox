@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './Auth.css';
 import { authService } from '../services/api';
 
-const Register = ({ onRegister, switchToLogin }) => {
+const Register = ({ switchToLogin }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,7 +28,7 @@ const Register = ({ onRegister, switchToLogin }) => {
     
     try {
       const response = await authService.register({ username, email, password });
-      switchToLogin(); // Redirect to login after successful registration
+      switchToLogin(); 
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {

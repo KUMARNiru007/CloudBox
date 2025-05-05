@@ -9,7 +9,7 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// Add proper path definitions
+
 router.route("/login").post(loginUser);  // Fix route definition
 router.route("/register").post(registerUser);
 router.post("/logout", verifyJWT, logoutUser);

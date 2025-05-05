@@ -24,7 +24,7 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/files", fileRoutes);
 
-// 404 handler
+// 404
 app.use("*", (req, res, next) => {
   const err = new ApiError(404, `Route ${req.originalUrl} not found`);
   next(err);

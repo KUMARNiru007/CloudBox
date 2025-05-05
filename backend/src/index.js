@@ -3,14 +3,14 @@ import app from "./app.js";
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
 
-// Load environment variables first
+// environment variables 
 dotenv.config({
     path: "./.env"
 });
 
 const PORT = process.env.PORT || 3000;
 
-// Then connect to the database
+// connect to the database
 connectDB()
     .then(() => {
         app.listen(PORT, () => {
