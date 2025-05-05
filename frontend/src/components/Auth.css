@@ -17,6 +17,15 @@
   max-width: 450px;
   transition: transform 0.3s, box-shadow 0.3s;
 }
+.auth-card h1 {
+  display: flex;
+  justify-content: center;
+  
+}
+
+.auth-card img {
+  object-fit:contain;
+}
 
 .auth-card h2 {
   color: var(--text-primary);

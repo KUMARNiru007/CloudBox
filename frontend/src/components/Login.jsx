@@ -34,7 +34,10 @@ const Login = ({ onLogin, switchToRegister }) => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h2>Login to CloudBox</h2>
+        <h1>CloudBox    
+          <img src="/fevicon.png" alt="" />  
+          </h1>
+        <h2>Login</h2>
         <p className="auth-subtitle">Access your files from anywhere</p>
         
         {error && <div className="auth-error">{error}</div>}
