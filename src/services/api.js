@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 const API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-backend-url.com/api/v1'  
+  ? 'https://your-render-backend-url.onrender.com/api/v1'  // Replace with your actual Render URL
   : 'http://localhost:3000/api/v1';
 
 // Create axios

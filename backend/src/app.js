@@ -6,8 +6,10 @@ import { ApiError } from "./utils/ApiError.js";
 
 // Import routes
 import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import fileRoutes from "./routes/file.routes.js";
 
+// Initialize express app
 const app = express();
 
 // Middleware
@@ -34,8 +36,18 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+// Add a root route handler
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Welcome to CloudBox API",
+    status: "success",
+    service: "online"
+  });
+});
+
 // Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/files", fileRoutes);
 
 // 404
