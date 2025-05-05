@@ -53,7 +53,7 @@ The application provides comprehensive API services:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/cloudstrorage.git
+   git clone https://github.com/KUMARNiru007/CloudBox
    cd cloudstrorage
 
    2. Install dependencies for both frontend and backend
