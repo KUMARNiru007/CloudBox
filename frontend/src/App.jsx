@@ -56,6 +56,14 @@ function App() {
   useEffect(() => {
     const loadUserData = async () => {
       try {
+        // Check if there's an auth token before making the API call
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+          setIsAuthenticated(false);
+          setLoading(false);
+          return;
+        }
+        
         // Check if user is logged in
         const userData = await authService.getCurrentUser();
         if (userData) {
@@ -68,6 +76,10 @@ function App() {
         }
       } catch (error) {
         console.error("Error loading user data:", error);
+        // Clear any potentially invalid auth data
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
         setIsAuthenticated(false);
       } finally {
         setLoading(false);
@@ -131,12 +143,24 @@ function App() {
     setIsAuthenticated(true);
   };
   
-  const handleLogout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    setFiles([]);
-    setRecycleBin([]);
-    localStorage.removeItem('authToken');
+  const handleLogout = async () => {
+    try {
+      // Call the logout API
+      await authService.logout();
+    } catch (error) {
+      console.error("Error during logout:", error);
+    } finally {
+      // Clear user state
+      setUser(null);
+      setIsAuthenticated(false);
+      setFiles([]);
+      setRecycleBin([]);
+      
+      // Clear all auth data from localStorage
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+    }
   };
   
   // If not authenticated, show login/register screens
