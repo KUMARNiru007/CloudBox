@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import './FileExplorer.css';
 import FileItem from './FileItem';
+import { fileService } from '../services/api';  // Add this import
 
 const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
   const [folders, setFolders] = useState([
@@ -53,23 +54,28 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
   );
 
   // Upload a file to the system
-  const uploadFile = (file) => {
+  const uploadFile = async (file) => {
     setIsLoading(true);
     
-    setTimeout(() => {
-      const newFile = {
-        id: Date.now().toString(),
-        name: file.name,
-        type: file.type,
-        size: file.size, // Store the raw size in bytes
-        displaySize: formatFileSize(file.size), // Add a separate property for display
-        file: file,
-        uploadDate: new Date().toLocaleDateString()
-      };
+    try {
+      const response = await fileService.uploadFile(file);
       
-      setFiles(prevFiles => [...prevFiles, newFile]);
+      // Update files with the new data from the server
+      if (response && response.data) {
+        setFiles(response.data.map(file => ({
+          id: file._id,
+          name: file.originalName,
+          type: file.mimeType,
+          size: file.size,
+          uploadDate: new Date(file.createdAt).toLocaleDateString()
+        })));
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      // You could add error handling UI here
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
   
   // Handle upload button click
@@ -80,7 +86,20 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
   // Handle file selection
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    selectedFiles.forEach(file => uploadFile(file));
+    
+    // Validate files before upload
+    selectedFiles.forEach(file => {
+      // Check file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+        return;
+      }
+      
+      // You can add more validations here (file type, etc.)
+      
+      uploadFile(file);
+    });
+    
     e.target.value = '';
   };
   
@@ -93,26 +112,33 @@ const FileExplorer = ({ darkMode, files, setFiles, backup, setRecycleBin }) => {
   };
   
   // Move a file to recycle bin instead of deleting it
-  const handleMoveToRecycleBin = (fileId) => {
+  const handleMoveToRecycleBin = async (fileId) => {
     const fileToRecycle = files.find(file => file.id === fileId);
     if (fileToRecycle) {
-      // Add file to recycle bin
-      setRecycleBin(prevRecycleBin => [...prevRecycleBin, fileToRecycle]);
-      // Remove file from files array
-      setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
+      try {
+        // Call the API to delete the file
+        await fileService.deleteFile(fileId);
+        
+        // Add file to recycle bin (frontend only)
+        setRecycleBin(prevRecycleBin => [...prevRecycleBin, fileToRecycle]);
+        
+        // Remove file from files array
+        setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
+      } catch (error) {
+        console.error("Error deleting file:", error);
+        // You could add error handling UI here
+      }
     }
   };
   
   // Download a file
-  const handleDownloadFile = (file) => {
-    const url = URL.createObjectURL(file.file);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleDownloadFile = async (file) => {
+    try {
+      await fileService.downloadFile(file.id, file.name);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      // You could add error handling UI here
+    }
   };
   
   // Navigate to a folder

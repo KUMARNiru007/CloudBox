@@ -85,7 +85,7 @@ export const authService = {
 
 // File services
 export const fileService = {
-  uploadFile: async (fileData) => {
+  uploadFile: async (fileData, onProgress) => {
     const formData = new FormData();
     formData.append('file', fileData);
     
@@ -93,10 +93,16 @@ export const fileService = {
       withCredentials: true,
       headers: {
         'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
       },
+      onUploadProgress: progressEvent => {
+        if (onProgress) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percentCompleted);
+        }
+      }
     });
     
-    // Add automatic sync after upload
     const filesData = await api.get('/files');
     return filesData.data;
   },
@@ -111,8 +117,32 @@ export const fileService = {
     const response = await api.get('/files');
     return response.data;
   },
+  
+  // Add these new methods
+  deleteFile: async (fileId) => {
+    const response = await api.delete(`/files/${fileId}`);
+    return response.data;
+  },
+  
+  downloadFile: async (fileId, fileName) => {
+    const response = await api.get(`/files/download/${fileId}`, {
+      responseType: 'blob'
+    });
+    
+    // Create a download link and trigger it
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    return response;
+  }
 };
 
+// Remove the duplicate apiFetch function at the bottom since you're using axios
 export default api;
 
 let accessToken = null;
