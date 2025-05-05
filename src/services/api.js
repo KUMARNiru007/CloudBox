@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api/v1';
+
+const API_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://your-backend-url.com/api/v1'  
+  : 'http://localhost:3000/api/v1';
 
 // Create axios
 const api = axios.create({
