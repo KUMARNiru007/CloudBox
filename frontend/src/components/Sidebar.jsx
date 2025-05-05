@@ -5,7 +5,9 @@ const Sidebar = ({ darkMode, setDarkMode, activeView, setActiveView, user, onLog
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <h1 className="app-title">CloudBox</h1>
+        <h1 className="app-title">CloudBox 
+          <img src="/fevicon.png" alt="" />
+        </h1>
       </div>
       
       {user && (
