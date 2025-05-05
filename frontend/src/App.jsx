@@ -5,6 +5,7 @@ import FileExplorer from './components/FileExplorer';
 import Backup from './components/Backup';
 import Login from './components/Login';
 import Register from './components/Register';
+import { authService, fileService } from './services/api';  // Add fileService import here
 
 function App() {
   // Use localStorage to persist dark mode preference
@@ -25,6 +26,7 @@ function App() {
   });
   
   const [authView, setAuthView] = useState('login'); // 'login' or 'register'
+  const [loading, setLoading] = useState(true);  // Add loading state
   
   // State for active view (files or recycle bin)
   const [activeView, setActiveView] = useState('files');
@@ -81,9 +83,23 @@ function App() {
       if (isAuthenticated) {
         try {
           const filesData = await fileService.syncFiles();
-          setFiles(filesData);
+          // Fix: Check if filesData has a data property and ensure it's an array
+          if (filesData && filesData.data) {
+            setFiles(filesData.data.map(file => ({
+              id: file._id,
+              name: file.originalName,
+              type: file.mimeType,
+              size: file.size,
+              uploadDate: new Date(file.createdAt).toLocaleDateString()
+            })));
+          } else {
+            // If no data property, ensure we at least set an empty array
+            setFiles([]);
+          }
         } catch (error) {
           console.error("Error loading files:", error);
+          // Ensure files is always an array even on error
+          setFiles([]);
         }
       }
     };
@@ -94,8 +110,20 @@ function App() {
     setUser(userData);
     setIsAuthenticated(true);
     // Load files immediately after login
-    const filesData = await fileService.syncFiles();
-    setFiles(filesData);
+    try {
+      const filesData = await fileService.syncFiles();
+      if (filesData && filesData.data) {
+        setFiles(filesData.data.map(file => ({
+          id: file._id,
+          name: file.originalName,
+          type: file.mimeType,
+          size: file.size,
+          uploadDate: new Date(file.createdAt).toLocaleDateString()
+        })));
+      }
+    } catch (error) {
+      console.error("Error loading files after login:", error);
+    }
   };
   
   const handleRegister = (userData) => {
@@ -108,7 +136,7 @@ function App() {
     setIsAuthenticated(false);
     setFiles([]);
     setRecycleBin([]);
-    // Remove localStorage.removeItem('authToken');
+    localStorage.removeItem('authToken');
   };
   
   // If not authenticated, show login/register screens
