@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: ./backend
+    container_name: cloudbox-backend
+    env_file:
+      - ./backend/.env
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    container_name: cloudbox-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"

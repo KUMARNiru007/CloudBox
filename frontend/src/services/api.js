@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://cloudbox-1.onrender.com/api/v1'  // Updated with actual Render.com URL
+const API_URL = import.meta.env.PROD
+  ? 'https://cloudbox-1.onrender.com/api/v1'
+  // ? '/api/v1' // Use this for Docker setup with nginx reverse proxy
   : 'http://localhost:3000/api/v1';
 
 // Create axios
@@ -77,7 +78,7 @@ export const authService = {
     try {
       const response = await api.get('/auth/me');
       return response.data;
-    } catch (error) {
+    } catch {
       
       localStorage.removeItem('authToken');
       return null;
@@ -91,7 +92,7 @@ export const fileService = {
     const formData = new FormData();
     formData.append('file', fileData);
     
-    const response = await axios.post(`${API_URL}/files/upload`, formData, {
+    await axios.post(`${API_URL}/files/upload`, formData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'multipart/form-data',
